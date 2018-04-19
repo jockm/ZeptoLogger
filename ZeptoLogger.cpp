@@ -41,7 +41,7 @@ void ZeptoLogger::log(uint8_t level, const char *msg)
 	memset(log, 0, sizeof(log));
 	
 	time(&t);
-	memccpy(log, (uint8_t *) &t, 8);
+	memcpy(log, (uint8_t *) &t, 8);
 	
 	log[8] = level;
 	
@@ -53,37 +53,35 @@ void ZeptoLogger::log(uint8_t level, const char *msg)
 }
 
 
-void ZeptoLogger::log(uint8_t level, const char *fmt, ...)
+void ZeptoLogger::logf(uint8_t level, const char *fmt, ...)
 {	
 	va_list args;
 
 	va_start(args, fmt);
-	this->log(level, fmt, args);
+	this->vlogf(level, fmt, args);
 	va_end(args);
 }
 
 
-void ZeptoLogger::log(uint8_t level, const char *format, va_list arg);
-
-void ZeptoLogger::error(const char *msg)
+void ZeptoLogger::vlogf(uint8_t level, const char *fmt, va_list arg)
 {
-	this->log(ZERROR, msg);
+	char msg[90];
+	memset(msg, 0, sizeof(msg));
+
+	vsnprintf(msg, sizeof(msg), fmt, arg);
+	this->log(level, msg);
 }
+
 
 void ZeptoLogger::error(const char *fmt, ...)
 {	
 	va_list args;
 
 	va_start(args, fmt);
-	this->log(ZERROR, fmt, args);
+	this->vlogf(ZERROR, fmt, args);
 	va_end(args);
 }
 
-
-void ZeptoLogger::warn(const char *msg)
-{
-	this->log(ZWARNING, msg);
-}
 
 
 void ZeptoLogger::warn(const char *fmt, ...)
@@ -91,14 +89,8 @@ void ZeptoLogger::warn(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	this->log(ZWARNING, fmt, args);
+	this->vlogf(ZWARNING, fmt, args);
 	va_end(args);
-}
-
-
-void ZeptoLogger::info(const char *msg)
-{
-	this->log(ZINFO, msg);
 }
 
 
@@ -107,13 +99,8 @@ void ZeptoLogger::info(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	this->log(ZINFO, fmt, args);
+	this->vlogf(ZINFO, fmt, args);
 	va_end(args);
-}
-
-void ZeptoLogger::debug(const char *msg)
-{
-	this->log(ZDEBUG, msg);
 }
 
 
@@ -122,6 +109,6 @@ void ZeptoLogger::debug(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	this->log(ZDEBUG, fmt, args);
+	this->vlogf(ZDEBUG, fmt, args);
 	va_end(args);
 }
